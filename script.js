@@ -3,19 +3,24 @@ const gameContainer = document.getElementById("game-container");
 const timerElement = document.getElementById("timer");
 const gameOverElement = document.getElementById("game-over");
 const scoreElement = document.getElementById("score");
+
 let isJumping = false;
 let isGameOver = true;
 let cactusInterval;
 let seconds = 0;
 let score = 0;
+const cactusSpeed = 5;
+const jumpHeight = 180;
+const jumpStep = 10;
+const cactusSpawnInterval = 1500;
 
 function startGame() {
   if (!isJumping && isGameOver) {
     isGameOver = false;
-    cactusInterval = setInterval(createCactus, 1500);
+    cactusInterval = setInterval(createCactus, cactusSpawnInterval);
     gameOverElement.style.display = "none";
     score = 0;
-    scoreElement.innerText = "Score: 0";
+    updateScore();
   }
 }
 
@@ -33,21 +38,21 @@ document.addEventListener("keydown", function (event) {
 function jump() {
   let position = 0;
   const jumpInterval = setInterval(function () {
-    if (position === 180) {
+    if (position === jumpHeight) {
       clearInterval(jumpInterval);
       let downInterval = setInterval(function () {
         if (position === 0) {
           clearInterval(downInterval);
           isJumping = false;
         }
-        position -= 10;
+        position -= jumpStep;
         if (position < 0) {
           position = 0;
         }
         dino.style.bottom = position + "px";
       }, 20);
     }
-    position += 10;
+    position += jumpStep;
     dino.style.bottom = position + "px";
   }, 20);
 }
@@ -58,17 +63,16 @@ function createCactus() {
   gameContainer.appendChild(newCactus);
   const containerHeight = gameContainer.offsetHeight;
   newCactus.style.bottom = "0";
-  newCactus.style.left = 870 + "px";
+  newCactus.style.left = gameContainer.offsetWidth + "px";
 
   moveCactus(newCactus);
 }
 
 function moveCactus(cactusElement) {
-  const cactusSpeed = 5;
   let cactusPosition = parseInt(cactusElement.style.left);
 
   const moveInterval = setInterval(function () {
-    if (cactusPosition === 0) {
+    if (cactusPosition <= 0) {
       clearInterval(moveInterval);
       cactusElement.remove();
     }
@@ -97,7 +101,7 @@ function gameOver() {
   clearInterval(cactusInterval);
   gameOverElement.style.display = "block";
   scoreElement.style.display = "block";
-  scoreElement.innerText = "Score: " + score;
+  updateScore();
   dino.style.bottom = "0";
   document.querySelectorAll(".cactus").forEach((cactus) => {
     cactus.remove();
@@ -106,11 +110,16 @@ function gameOver() {
   timerElement.style.display = "none";
 }
 
+function updateScore() {
+  scoreElement.innerText = "Score: " + score;
+}
+
 setInterval(function () {
   if (!isGameOver) {
-    seconds++;
+    ++seconds;
     timerElement.innerText = seconds + "s";
     timerElement.style.display = "block";
-    score++;
+    ++score;
+    updateScore();
   }
 }, 1000);
