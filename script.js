@@ -10,7 +10,7 @@ let cactusInterval;
 let seconds = 0;
 let score = 0;
 const cactusSpeed = 5;
-const jumpHeight = 180;
+const jumpHeight = 185;
 const jumpStep = 10;
 const cactusSpawnInterval = 1500;
 
